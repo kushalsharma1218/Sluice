@@ -1,0 +1,52 @@
+name: sluice
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: sluice
+      POSTGRES_USER: sluice
+      POSTGRES_PASSWORD: sluice
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sluice -d sluice"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  redis:
+    image: redis:7-alpine
+    # No persistence: this is a cache. Losing it costs latency, never correctness.
+    command: ["redis-server", "--save", "", "--appendonly", "no"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  sluice:
+    build: .
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      SLUICE_DB_URL: jdbc:postgresql://postgres:5432/sluice
+      SLUICE_DB_USER: sluice
+      SLUICE_DB_PASSWORD: sluice
+      SLUICE_REDIS_HOST: redis
+      SLUICE_ADMIN_TOKEN: ${SLUICE_ADMIN_TOKEN:-dev-admin-token}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:?set ANTHROPIC_API_KEY before starting}
+      ANTHROPIC_BASE_URL: ${ANTHROPIC_BASE_URL:-https://api.anthropic.com}
+      SLUICE_LOG_LEVEL: ${SLUICE_LOG_LEVEL:-INFO}
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres-data:

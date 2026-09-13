@@ -1,0 +1,68 @@
+spring:
+  application:
+    name: sluice
+  threads:
+    virtual:
+      enabled: true            # a blocking relay per in-flight call costs ~nothing
+  datasource:
+    url: ${SLUICE_DB_URL:jdbc:postgresql://localhost:5432/sluice}
+    username: ${SLUICE_DB_USER:sluice}
+    password: ${SLUICE_DB_PASSWORD:sluice}
+    hikari:
+      maximum-pool-size: ${SLUICE_DB_POOL:20}
+      pool-name: sluice-pool
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  data:
+    redis:
+      host: ${SLUICE_REDIS_HOST:localhost}
+      port: ${SLUICE_REDIS_PORT:6379}
+      timeout: 200ms           # the fast path is not allowed to be slow
+      connect-timeout: 500ms
+      # No connection pool on purpose: Lettuce's connection is thread-safe and
+      # shared, which is exactly what a virtual-thread request path wants.
+  mvc:
+    async:
+      request-timeout: -1      # streams outlive the default MVC async timeout
+
+server:
+  port: ${SLUICE_PORT:8080}
+  compression:
+    enabled: false             # never re-encode a stream we are relaying verbatim
+
+sluice:
+  provider:
+    base-url: ${ANTHROPIC_BASE_URL:https://api.anthropic.com}
+    api-key: ${ANTHROPIC_API_KEY:}
+    anthropic-version: "2023-06-01"
+    connect-timeout: 10s
+    request-timeout: 10m
+  hold:
+    ttl: ${SLUICE_HOLD_TTL:15m}
+    sweep-interval: 30s
+    sweep-batch-size: 200
+    default-max-tokens: 8192
+  budget:
+    # Refuse an account chain with neither prepaid credit nor a budget. Fail closed.
+    allow-unmetered: ${SLUICE_ALLOW_UNMETERED:false}
+  cache:
+    enabled: ${SLUICE_CACHE_ENABLED:true}
+    ttl: 5m
+    reconcile-interval: 60s
+  admin:
+    # Empty disables /admin/** outright rather than leaving it unauthenticated.
+    token: ${SLUICE_ADMIN_TOKEN:}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+logging:
+  level:
+    dev.sluice: ${SLUICE_LOG_LEVEL:INFO}
