@@ -60,7 +60,7 @@ create table journal_entry (
 
 create index journal_entry_created_idx on journal_entry (created_at);
 
--- account_ref namespaces the ledger accounts described in the PRD:
+-- account_ref namespaces four ledger accounts onto each customer account:
 --   credits:<account_id>  spendable prepaid pot        (normal DEBIT balance)
 --   holds:<account_id>    reserved, not yet settled    (normal DEBIT balance)
 --   usage:<account_id>    lifetime consumption         (normal DEBIT balance)

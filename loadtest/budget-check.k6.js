@@ -51,7 +51,8 @@ export const options = {
     },
   },
   thresholds: {
-    // The PRD's non-functional target for the budget check.
+    // Latency target for the budget check: it gates every call, so it has to be
+    // cheap enough that refusing traffic costs nothing.
     'sluice_budget_check_ms': ['p(99)<2'],
     'checks': ['rate>0.99'],
   },

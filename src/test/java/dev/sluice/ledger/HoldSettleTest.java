@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * M2: the hold/settle cycle, and its central promise -- replaying a request id
+ * The hold/settle cycle, and its central promise -- replaying a request id
  * charges exactly once.
  */
 class HoldSettleTest extends AbstractIntegrationTest {

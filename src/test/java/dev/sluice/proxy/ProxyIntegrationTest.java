@@ -36,8 +36,8 @@ import static org.awaitility.Awaitility.await;
 /**
  * End-to-end through the real HTTP stack against a stand-in provider.
  *
- * <p>Covers M0 (the proxy shape), M2 (hold, settle, exactly-once) and M3
- * (streaming, partial settlement, client disconnect).
+ * <p>Covers the proxy shape, the hold/settle cycle and its exactly-once guarantee,
+ * and streaming with partial settlement on client disconnect.
  */
 class ProxyIntegrationTest extends AbstractWebTest {
 
@@ -60,7 +60,7 @@ class ProxyIntegrationTest extends AbstractWebTest {
         virtualKey = issued.secret();
     }
 
-    // ------------------------------------------------------------------ M0/M2
+    // ----------------------------------------------- proxy shape and metering
 
     @Test
     @DisplayName("a non-streaming call is relayed verbatim and charged from the provider's own usage block")
@@ -152,7 +152,7 @@ class ProxyIntegrationTest extends AbstractWebTest {
         assertLedgerIsSound();
     }
 
-    // --------------------------------------------------------------------- M3
+    // ---------------------------------------------- streaming and disconnect
 
     @Test
     @DisplayName("a streamed call relays every event and settles on the provider's final usage")

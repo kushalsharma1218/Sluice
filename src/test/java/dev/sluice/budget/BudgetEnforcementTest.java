@@ -20,7 +20,7 @@ import java.time.Instant;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * M4's acceptance criterion: a team with a $5 budget is refused at $5.01, and the
+ * Hard budget enforcement: a team with a $5 budget is refused at $5.01, and the
  * provider call is never made.
  */
 class BudgetEnforcementTest extends AbstractWebTest {

@@ -23,8 +23,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 /**
- * M1's acceptance criterion: fire a thousand concurrent transfers and prove the
- * debits-equal-credits invariant survives.
+ * Fires a thousand concurrent transfers and proves the debits-equal-credits
+ * invariant survives -- the guarantee everything else in the system rests on.
  */
 class LedgerConcurrencyTest extends AbstractIntegrationTest {
 
